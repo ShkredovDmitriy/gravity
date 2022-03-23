@@ -1,0 +1,31 @@
+// NOTEBOOK
+@mixin media-netebook {
+  @media screen and (max-width: 1200px) {
+    @content;
+  }
+}
+
+// TABLET
+@mixin media-tablet {
+  @media screen and (max-width: 812px) and (orientation: portrait), screen and (max-width: 600px) {
+    @content;
+  }
+}
+
+@mixin min_aspect_ratio_500_850 {
+  @media (max-width: 812px) and (min-aspect-ratio: 500/850) and (orientation: portrait) {
+    @content;
+  }
+}
+
+@mixin font-face($font-family, $file-path, $weight: normal, $style: normal) {
+  @font-face {
+    font-family: $font-family;
+    font-style: $style;
+    font-weight: $weight;
+    font-display: swap;
+
+    src: url("#{$file-path}.woff2") format("woff2"),
+      url("#{$file-path}.woff") format("woff");
+  }
+}

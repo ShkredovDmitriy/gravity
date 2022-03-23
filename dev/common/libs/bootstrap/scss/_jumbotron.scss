@@ -1,0 +1,17 @@
+.jumbotron {
+  @include border-radius($border-radius-lg);
+
+  @include media-breakpoint-up(sm) {
+    padding: ($jumbotron-padding * 2) $jumbotron-padding;
+  }
+  margin-bottom: $jumbotron-padding;
+  padding: $jumbotron-padding ($jumbotron-padding / 2);
+  background-color: $jumbotron-bg;
+  color: $jumbotron-color;
+}
+
+.jumbotron-fluid {
+  @include border-radius(0);
+  padding-right: 0;
+  padding-left: 0;
+}
