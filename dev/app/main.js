@@ -1,8 +1,8 @@
 import "~/common/scss/main.scss";
 import planets from './planets';
 
-const G = 0.0000000000667;
-const time = 1;
+const G = 0.00000000000667;
+const time = 0.1;
 
 window.onload = function() {
   const canvas = document.createElement("canvas");
@@ -18,57 +18,40 @@ window.onload = function() {
 
     planets.forEach((planet) => {
 
+      planet.Fgx = 0;
+      planet.Fgy = 0;
+
       planets.forEach((object) => {
         if(planet.name !== object.name) {
-          // console.log('object.name', object.name);
 
           // Притяжение
           const distance = calcDistance(planet.position.x, planet.position.y, object.position.x, object.position.y);
-          const Fp = ( G * planet.mass * object.mass ) / distance * distance;
-          // console.log('Fp', Fp);
-
-          // Центростремительная сила
-          const Fc = ( planet.mass * (Math.abs(planet.speed.x) + Math.abs(planet.speed.y))^2 ) / distance;
-          // console.log('Fc', Fc);
-
-          // Результирующая сила
-          const Fsum = Fp - Fc;
-          // console.log('Fsum', Fsum);
-
-          // Вектор
           const vector = calcVector(planet.position.x, planet.position.y, object.position.x, object.position.y);
-          // planet.vektor.x = (planet.vektor.x + vector.x) / 2;
-          // planet.vektor.y = (planet.vektor.y + vector.y) / 2;
-          // console.log('planet.vektor', Math.abs(planet.vektor.x) + Math.abs(planet.vektor.y));
-
-          const Fx = Fsum * vector.x;
-          const Fy = Fsum * vector.y;
-          const ax = Fx / planet.mass;
-          const ay = Fy / planet.mass;
-          planet.speed.x += ax;
-          planet.speed.y += ay;
-          planet.position.x += planet.speed.x * time;
-          planet.position.y += planet.speed.y * time;
-          // console.log('planet.speed', {x: planet.speed.x, y: planet.speed.y});
+          const Fg = ( G * planet.mass * object.mass) / distance * distance;
+          planet.Fgx = planet.Fgx + Fg * vector.x;
+          planet.Fgy = planet.Fgy + Fg * vector.y;
         }
       })
+
+      planet.agx = planet.Fgx / planet.mass;
+      planet.agy = planet.Fgy / planet.mass;
+      planet.speed_x += planet.agx;
+      planet.speed_y += planet.agy;
+      planet.position.x += planet.speed_x;
+      planet.position.y += planet.speed_y;
+      planet.vektor.x = planet.Fgx / (Math.abs(planet.Fgx) + Math.abs(planet.Fgy));
+      planet.vektor.y = planet.Fgy / (Math.abs(planet.Fgx) + Math.abs(planet.Fgy));
+
       drawPlanet(ctx, planet)
     })
-    window.requestAnimationFrame(tik);
+     window.requestAnimationFrame(tik);
   }
   tik()
   // setInterval(
   //   () => { tik() },
-  //   500
+  //   100
   // )
 }
-
-
-
-
-
-
-
 
 
 
@@ -83,9 +66,22 @@ window.onload = function() {
 function drawPlanet(ctx, planet) {
   ctx.beginPath();
   ctx.arc(planet.position.x,planet.position.y,planet.size,0,Math.PI*2,true);
-  ctx.stroke();
   ctx.fillStyle='#ff0000';
+  ctx.strokeStyle='#ff0000';
   ctx.fill();
+  ctx.stroke();
+  ctx.moveTo(planet.position.x,planet.position.y);
+  ctx.lineTo(planet.position.x + planet.vektor.x * 20, planet.position.y + planet.vektor.y * 20);
+  ctx.stroke();
+
+  // console.log(planet.name, {
+    // "Сила гравитационная": planet.Fg,
+    // "Сила центробежная": planet.Fc,
+    // "Вектор Fg x": planet.vektor.x,
+    // "Вектор Fg y": planet.vektor.y,
+    // "Ускорение g x": planet.agx,
+    // "Ускорение g y": planet.agy,
+  // })
 }
 
 function calcDistance(x1, y1, x2, y2) {
